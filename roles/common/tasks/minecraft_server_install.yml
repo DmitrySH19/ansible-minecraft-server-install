@@ -1,0 +1,54 @@
+---
+
+- name: Minecraft 1.12.1 server
+  hosts: mcserver
+  user: ezrial
+  vars_files:
+    - ../vars/install_vars.yml
+  tasks:
+
+    - name: Get packages
+      apt: name={{ packages }} state=latest
+
+    - name: Create minecraftserver dir
+      file: state=directory path={{ mcs_dir }}
+
+    - name: Create mods folder
+      file: state=directory path={{ mcs_dir }}/mods
+
+    - name: Wget mcserver jar
+      get_url:
+        url: https://s3.amazonaws.com/Minecraft.Download/versions/1.12.2/minecraft_server.1.12.2.jar
+        dest: '{{ mcs_dir }}/{{ mcs_jar }}'
+    
+    - name: Wget Forge mod loader
+      get_url:
+        url: https://maven.minecraftforge.net/net/minecraftforge/forge/1.12.2-14.23.5.2855/forge-1.12.2-14.23.5.2855-installer.jar
+        dest: '{{ mcs_dir }}/{{ mcs_forge }}'
+
+    - name: Install Forge
+      shell: java -jar {{ mcs_dir }}/{{ mcs_forge }} --installServer 
+      args:
+        chdir: '{{ mcs_dir }}'
+
+    - name: Agree to EULA
+      template: src=../templates/mc_eula.tpl dest='{{ mcs_dir }}/eula.txt'
+
+    - name: configure server-properties
+      template: src=../templates/server.properties.tpl dest='{{ mcs_dir }}/server.properties'
+
+    - name: Check screen for running sessions
+      shell: screen -ls
+      register: sessions
+      failed_when: sessions.rc == 0 or sessions.rc >= 2
+
+    - name: Download mod (industrial craft 2)
+      get_url: 
+        url: https://minecraft-inside.ru/download/165350/
+        dest: '{{ mcs_dir }}/mods/industrialcraft_2_2.8.221_ex112.jar'
+
+    - name: Run forge server
+      shell: screen -s {{ session_name }} -d -m java -Xmx2048M -Xms2048M -jar {{ mcs_dir }}/{{ forge_jar }} nogui
+      args:
+        chdir: '{{ mcs_dir }}'
+

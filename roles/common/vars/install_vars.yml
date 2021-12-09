@@ -1,0 +1,7 @@
+
+packages: ['apt', 'wget', 'openjdk-8-jdk', 'screen']
+mcs_dir: /home/ezrial/mc_server
+mcs_jar: minecraft_server.1.12.2.jar
+mcs_forge: forge-1.12.2-14.23.5.2855-installer.jar
+forge_jar: forge-1.12.2-14.23.5.2855.jar
+session_name: mcserver
