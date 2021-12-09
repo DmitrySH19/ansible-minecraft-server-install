@@ -1,0 +1,6 @@
+---
+
+- import_playbook: ./roles/common/tasks/minecraft_server_install.yml
+- hosts: mcserver
+  roles:
+    - commons
