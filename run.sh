@@ -1,1 +1,1 @@
-sudo ansible-playbook installer.yml
+sudo ansible-playbook installer.yml -i inventory
